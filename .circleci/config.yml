@@ -37,8 +37,10 @@ jobs:
         - ~/.m2
         key: v1-dependencies-{{ checksum "pom.xml" }}
 
-    # run tests!
-    - run: mvn integration-test
+    # Build
+    - run:
+        name: build
+        command: mvn clean integration-test
 
     # collect the results
     - run:
