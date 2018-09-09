@@ -13,6 +13,7 @@
         <module>config-service</module>
         <module>eureka-service</module>
         <module>user-service</module>
+        <module>campaign-manager-service</module>
     </modules>
 
 </project>

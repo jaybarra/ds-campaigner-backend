@@ -1,0 +1,48 @@
+version: "3.7"
+services:
+  neo4j:
+    image: neo4j:3.4.7
+    volumes:
+    - campaign-manager-neo4j:/data
+    ports:
+    - "7474:7474"
+    - "7687:7687"
+    environment:
+      NEO4J_AUTH: none
+
+  postgres:
+    image: postgres:11
+    volumes:
+    - user-service-postgres:/var/lib/postgresql/data
+    ports:
+    - "5432:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ds-users
+
+  zipkin:
+    image: openzipkin/zipkin
+    ports:
+    - "9411:9411"
+    environment:
+      STORAGE_TYPE: cassandra
+      STORAGE_PORT_9042_TCP_ADDR: zipkin-storage
+    networks:
+      zipkin:
+
+  zipkin-storage:
+    image: cassandra:3.11.3
+    volumes:
+    - zipkin-cassandra:/var/lib/cassandra
+    ports:
+    - "9042:9042"
+    networks:
+      zipkin:
+
+volumes:
+  campaign-manager-neo4j:
+  user-service-postgres:
+  zipkin-cassandra:
+
+networks:
+  zipkin:

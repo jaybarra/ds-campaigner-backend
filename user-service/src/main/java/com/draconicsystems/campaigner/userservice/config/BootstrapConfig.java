@@ -4,12 +4,13 @@ import com.draconicsystems.campaigner.userservice.domain.Permission;
 import com.draconicsystems.campaigner.userservice.domain.Role;
 import com.draconicsystems.campaigner.userservice.services.PermissionService;
 import com.draconicsystems.campaigner.userservice.services.RoleService;
-import com.draconicsystems.campaigner.userservice.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
 
 @Component
 public class BootstrapConfig implements CommandLineRunner {
@@ -23,13 +24,20 @@ public class BootstrapConfig implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
-        Permission createUser = permissionService.createPermission("CREATE_USER", "Create users");
-        Permission deleteUser = permissionService.createPermission("DELETE_USER", "Delete users");
-        Permission archiveUser = permissionService.createPermission("ARCHIVE_USER", "Delete users");
-        Permission activateUser = permissionService.createPermission("ACTIVATE_USER", "Delete users");
+    public void run(String... args) {
+        Permission createUser = permissionService.getOrCreatePermission("CREATE_USER");
+        Permission deleteUser = permissionService.getOrCreatePermission("DELETE_USER");
+        Permission archiveUser = permissionService.getOrCreatePermission("ARCHIVE_USER");
+        Permission activateUser = permissionService.getOrCreatePermission("ACTIVATE_USER");
+
+        List<Permission> adminPermissions = Arrays.asList(createUser, deleteUser, archiveUser, activateUser);
 
         Role admin = roleService.getOrCreateRole("ADMIN");
-        admin.getPermissions().addAll(Arrays.asList(createUser, deleteUser, archiveUser, activateUser));
+
+        Predicate<Permission> hasPermission = p -> adminPermissions.stream().anyMatch(p2 -> p2.getName().equals(p.getName()));
+
+        if (!admin.getPermissions().stream().allMatch(hasPermission)) {
+            admin.getPermissions().addAll(adminPermissions);
+        }
     }
 }

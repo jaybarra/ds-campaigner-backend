@@ -20,4 +20,15 @@ public class PermissionServiceImpl implements PermissionService {
 
         return permissionRepository.save(permission);
     }
+
+    @Override
+    public Permission getOrCreatePermission(String name) {
+        Permission permission = permissionRepository.findByName(name);
+        if (permission == null) {
+            permission = new Permission();
+            permission.setName(name);
+            return permissionRepository.save(permission);
+        }
+        return permission;
+    }
 }

@@ -4,4 +4,6 @@ import com.draconicsystems.campaigner.userservice.domain.Permission;
 
 public interface PermissionService {
     Permission createPermission(String name, String description);
+
+    Permission getOrCreatePermission(String name);
 }
